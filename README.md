@@ -233,6 +233,7 @@ keys of the providers you want to test:
 | Exa | `EXA_API_KEY` |
 | Parallel | `PARALLEL_API_KEY` |
 | Brave | `BRAVE_API_KEY` |
+| SpecStream | `SPECSTREAM_API_KEY` |
 
 ```bash
 python3 benchmark.py --providers cloro,serpapi,tavily,exa,parallel,brave --n 1000 --workers 4

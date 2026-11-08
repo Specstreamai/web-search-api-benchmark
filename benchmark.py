@@ -206,6 +206,19 @@ def search_brave(t, q):
     return d, [block(r.get("title"), r.get("url"), "\n".join([r.get("description") or ""] + (r.get("extra_snippets") or []))) for r in results], False
 
 
+def search_specstream(t, q, with_answer=True):
+    params = {"q": q, "num": NUM_RESULTS}
+    d = t.http(
+        "https://api.specstream.ai/v1/web-search?" + urllib.parse.urlencode(params),
+        headers={"Authorization": f"Bearer {os.environ['SPECSTREAM_API_KEY']}"},
+    )
+    r = d.get("data") or {}
+    answer = (r.get("answer") or {}) if with_answer else {}
+    parts = ["[Answer]\n" + block(None, answer.get("page"), answer.get("value"))] if answer.get("value") else []
+    parts += [block(s.get("title"), s.get("url"), s.get("snippet")) for s in (r.get("sources") or [])[:NUM_RESULTS]]
+    return d, parts, False
+
+
 PROVIDERS = {
     "cloro": search_cloro,
     "cloro-noaio": lambda t, q: search_cloro(t, q, with_aio=False),
@@ -214,6 +227,8 @@ PROVIDERS = {
     "exa": search_exa,
     "parallel": search_parallel,
     "brave": search_brave,
+    "specstream": search_specstream,
+    "specstream-noanswer": lambda t, q: search_specstream(t, q, with_answer=False),
 }
 
 
